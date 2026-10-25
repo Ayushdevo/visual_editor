@@ -624,7 +624,7 @@ The work demonstrates practical experience with computer vision, metric learning
 
 **Ayush Tiwari**
 
-B.Tech — Data Science and Artificial Intelligence  
+Data Science and Artificial Intelligence  
 Indian Institute of Technology Guwahati
 
 **GitHub:** https://github.com/Ayushdevo
