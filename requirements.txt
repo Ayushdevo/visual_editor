@@ -1,0 +1,6 @@
+torch>=2.2,<3
+torchvision>=0.17,<1
+numpy>=1.26,<3
+Pillow>=10,<13
+gradio>=5,<7
+pytest>=8,<10

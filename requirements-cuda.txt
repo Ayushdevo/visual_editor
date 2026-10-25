@@ -1,0 +1,5 @@
+# Windows / Python 3.11 GPU environment. Install instead of requirements.txt.
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
+-r requirements.txt
