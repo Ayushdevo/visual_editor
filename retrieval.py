@@ -26,6 +26,10 @@ class L2Index:
             raise ValueError('k must be a nonnegative integer')
         d = self.distances(queries)
         if exclude is not None:
-            d[np.arange(len(d)),np.asarray(exclude)] = np.inf
+            excluded = np.asarray(exclude)
+            if (excluded.shape != (len(d),) or excluded.dtype.kind not in 'iu'
+                    or (excluded < 0).any() or (excluded >= len(self.gallery)).any()):
+                raise ValueError('exclude must contain one valid integer gallery index per query')
+            d[np.arange(len(d)), excluded] = np.inf
         ids = np.argsort(d,axis=1,kind='stable')[:,:k]
         return ids,np.take_along_axis(d,ids,axis=1)
