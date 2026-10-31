@@ -4,9 +4,12 @@ import numpy as np
 class L2Index:
     def __init__(self, embeddings):
         self.gallery = np.array(embeddings,dtype=np.float64,copy=True)
-        self.norms = (self.gallery**2).sum(1)
+        if self.gallery.ndim != 2 or 0 in self.gallery.shape:
+            raise ValueError('Gallery must be a nonempty embedding matrix')
     def distances(self, queries):
         q = np.atleast_2d(queries).astype(np.float64)
+        if q.ndim != 2 or q.shape[1] != self.gallery.shape[1]:
+            raise ValueError('Query matrix dimension must match gallery embeddings')
         # Direct differences avoid cancellation for nearby, large-magnitude vectors.
         # Process one query at a time to bound temporary memory by gallery size.
         distances = np.empty((len(q), len(self.gallery)), dtype=np.float64)
