@@ -3,7 +3,7 @@ import numpy as np
 
 class L2Index:
     def __init__(self, embeddings):
-        self.gallery = np.asarray(embeddings,dtype=np.float32)
+        self.gallery = np.array(embeddings,dtype=np.float32,copy=True)
         self.norms = (self.gallery**2).sum(1)
     def distances(self, queries):
         q = np.atleast_2d(queries).astype(np.float32)
