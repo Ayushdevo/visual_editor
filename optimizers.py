@@ -1,9 +1,13 @@
 """Tensor-only SGD momentum, Adam, and fixed-beta NAdam (Dozat form)."""
+import math
 import torch
 
 class Optimizer:
     def __init__(self, params, kind='adam', lr=1e-3, beta1=0.9,
                  beta2=0.999, eps=1e-8, momentum=0.9, weight_decay=0):
+        if not all(math.isfinite(value) for value in
+                   (lr, beta1, beta2, eps, momentum, weight_decay)):
+            raise ValueError('Optimizer parameters must be finite')
         if kind not in {'adam', 'nadam', 'sgd'}:
             raise ValueError(kind)
         if lr <= 0 or eps <= 0 or not 0 <= beta1 < 1 or not 0 <= beta2 < 1 or not 0 <= momentum < 1 or weight_decay < 0:
