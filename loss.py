@@ -1,7 +1,12 @@
 """Own Euclidean triplet objective and in-batch mining; no library losses."""
+import math
 import torch
 
 def triplet_loss(z, labels, margin=0.3, mining='hard'):
+    if not math.isfinite(margin) or margin < 0:
+        raise ValueError('margin must be finite and nonnegative')
+    if mining not in {'hard', 'random'}:
+        raise ValueError('mining must be hard or random')
     # Explicit differences keep the diagonal at exactly zero.
     d = ((z[:, None] - z[None, :]).square().sum(-1) + 1e-12).sqrt()
     same = labels[:, None].eq(labels[None, :])
