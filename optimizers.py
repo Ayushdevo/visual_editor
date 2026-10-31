@@ -13,6 +13,8 @@ class Optimizer:
         if lr <= 0 or eps <= 0 or not 0 <= beta1 < 1 or not 0 <= beta2 < 1 or not 0 <= momentum < 1 or weight_decay < 0:
             raise ValueError('Invalid optimizer parameters')
         self.params = list(params)
+        if len({id(parameter) for parameter in self.params}) != len(self.params):
+            raise ValueError('Duplicate optimizer parameters would be updated more than once')
         self.kind, self.lr = kind, lr
         self.b1, self.b2, self.eps = beta1, beta2, eps
         self.mu, self.wd = momentum, weight_decay
