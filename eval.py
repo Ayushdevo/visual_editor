@@ -15,6 +15,7 @@ def embed(model, dataset, device, batch_size=256):
 
 def evaluate(z,y,chunk=128):
     """Every test image queries the other N-1 images; self is excluded."""
+    z, y = np.asarray(z), np.asarray(y)
     index = L2Index(z)
     hits = {k:0 for k in (1,5,10)}
     aps = []
@@ -33,6 +34,7 @@ def evaluate(z,y,chunk=128):
 
 def triplet_accuracy(z,y,seed=42):
     """One fixed random positive and negative per validation anchor."""
+    z, y = np.asarray(z), np.asarray(y)
     rng = np.random.default_rng(seed)
     p,n = [],[]
     for i,c in enumerate(y):
