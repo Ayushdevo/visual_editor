@@ -31,5 +31,6 @@ class L2Index:
                     or (excluded < 0).any() or (excluded >= len(self.gallery)).any()):
                 raise ValueError('exclude must contain one valid integer gallery index per query')
             d[np.arange(len(d)), excluded] = np.inf
-        ids = np.argsort(d,axis=1,kind='stable')[:,:k]
+        available = len(self.gallery) - (exclude is not None)
+        ids = np.argsort(d,axis=1,kind='stable')[:, :min(k, available)]
         return ids,np.take_along_axis(d,ids,axis=1)
