@@ -13,9 +13,21 @@ def embed(model, dataset, device, batch_size=256):
         ys.append(y.numpy())
     return np.concatenate(zs),np.concatenate(ys)
 
+def _metric_inputs(z, y):
+    z, y = np.asarray(z), np.asarray(y)
+    if z.ndim != 2 or len(z) < 2:
+        raise ValueError('Metrics require at least two embedding samples')
+    if y.ndim != 1 or len(y) != len(z):
+        raise ValueError('Metrics require one-dimensional labels aligned with samples')
+    if not np.isfinite(z).all():
+        raise ValueError('Embedding samples must be finite')
+    return z, y
+
 def evaluate(z,y,chunk=128):
     """Every test image queries the other N-1 images; self is excluded."""
-    z, y = np.asarray(z), np.asarray(y)
+    if isinstance(chunk, (bool, np.bool_)) or not isinstance(chunk, (int, np.integer)) or chunk < 1:
+        raise ValueError('chunk must be a positive integer')
+    z, y = _metric_inputs(z, y)
     index = L2Index(z)
     hits = {k:0 for k in (1,5,10)}
     aps = []
@@ -34,7 +46,7 @@ def evaluate(z,y,chunk=128):
 
 def triplet_accuracy(z,y,seed=42):
     """One fixed random positive and negative per validation anchor."""
-    z, y = np.asarray(z), np.asarray(y)
+    z, y = _metric_inputs(z, y)
     rng = np.random.default_rng(seed)
     p,n = [],[]
     for i,c in enumerate(y):
