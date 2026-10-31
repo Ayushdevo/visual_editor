@@ -22,6 +22,8 @@ class L2Index:
             distances[row] = np.einsum('ij,ij->i', difference, difference)
         return distances
     def search(self, queries, k=5, exclude=None):
+        if isinstance(k, (bool, np.bool_)) or not isinstance(k, (int, np.integer)) or k < 0:
+            raise ValueError('k must be a nonnegative integer')
         d = self.distances(queries)
         if exclude is not None:
             d[np.arange(len(d)),np.asarray(exclude)] = np.inf
