@@ -6,6 +6,8 @@ from retrieval import L2Index
 
 @torch.no_grad()
 def embed(model, dataset, device, batch_size=256):
+    if len(dataset) == 0:
+        raise ValueError('Cannot embed an empty dataset')
     model.eval()
     zs,ys = [],[]
     for x,y in DataLoader(dataset,batch_size=batch_size,shuffle=False):
@@ -55,3 +57,4 @@ def triplet_accuracy(z,y,seed=42):
     dp = ((z-z[p])**2).sum(1)
     dn = ((z-z[n])**2).sum(1)
     return float((dp<dn).mean())
+
