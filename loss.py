@@ -9,6 +9,8 @@ def triplet_loss(z, labels, margin=0.3, mining='hard'):
         raise ValueError('mining must be hard or random')
     if z.ndim != 2 or z.shape[1] == 0 or labels.ndim != 1 or len(labels) != len(z):
         raise ValueError('Expected an embedding matrix and one aligned label per row')
+    if not z.is_floating_point() or not torch.isfinite(z).all():
+        raise ValueError('Embeddings must be finite floating-point values')
     # Explicit differences keep the diagonal at exactly zero.
     d = ((z[:, None] - z[None, :]).square().sum(-1) + 1e-12).sqrt()
     same = labels[:, None].eq(labels[None, :])
