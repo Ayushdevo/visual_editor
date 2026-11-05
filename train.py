@@ -39,6 +39,18 @@ def main():
         print(f'GPU: {torch.cuda.get_device_name(torch.device(args.device))}', flush=True)
     if args.epochs < 1:
         p.error('epochs must be positive; final submission requires >=30')
+    if args.dim < 1 or args.p < 2 or args.k < 2:
+        p.error('dim must be positive; p and k must be at least two')
+    if not math.isfinite(args.margin) or args.margin < 0:
+        p.error('margin must be finite and nonnegative')
+    if not 0 <= args.seed < 2**32:
+        p.error('seed must be between 0 and 2**32 - 1')
+    # Validate optimizer options before creating files or downloading CIFAR-100.
+    try:
+        Optimizer([torch.zeros(1)], args.optimizer, args.lr, args.beta1, args.beta2,
+                  args.eps, args.momentum, args.weight_decay)
+    except ValueError as exc:
+        p.error(str(exc))
     seed_all(args.seed)
     out = Path(args.out); out.mkdir(parents=True,exist_ok=True)
     (out/'config.json').write_text(json.dumps(vars(args),indent=2))
@@ -84,3 +96,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
