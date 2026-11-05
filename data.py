@@ -44,7 +44,10 @@ class PKSampler(Sampler):
         if any(isinstance(v, (bool, np.bool_)) or not isinstance(v, (int, np.integer))
                for v in (p, k)):
             raise ValueError('p and k must be integers')
-        self.groups = [np.flatnonzero(np.asarray(targets)==c) for c in np.unique(targets)]
+        targets = np.asarray(targets)
+        if targets.ndim != 1 or not len(targets):
+            raise ValueError('targets must be a nonempty one-dimensional sequence')
+        self.groups = [np.flatnonzero(targets==c) for c in np.unique(targets)]
         self.p,self.k,self.seed,self.epoch = p,k,seed,0
         if p < 2 or p > len(self.groups) or k < 2 or any(len(g)<k for g in self.groups):
             raise ValueError('Need >=2 classes and >=2 samples per selected class')
