@@ -31,6 +31,9 @@ class Optimizer:
 
     @torch.no_grad()
     def step(self):
+        # Preflight all gradients before mutating any parameters or state.
+        if any(p.grad is not None and p.grad.is_sparse for p in self.params):
+            raise ValueError('Sparse gradients are not supported')
         for i, p in enumerate(self.params):
             if p.grad is None:
                 continue
