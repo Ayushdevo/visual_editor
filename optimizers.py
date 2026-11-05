@@ -13,6 +13,11 @@ class Optimizer:
         if lr <= 0 or eps <= 0 or not 0 <= beta1 < 1 or not 0 <= beta2 < 1 or not 0 <= momentum < 1 or weight_decay < 0:
             raise ValueError('Invalid optimizer parameters')
         self.params = list(params)
+        if not self.params:
+            raise ValueError('Optimizer requires at least one parameter')
+        if any(not isinstance(p, torch.Tensor) or not p.is_floating_point() or not p.is_leaf
+               for p in self.params):
+            raise ValueError('Optimizer parameters must be floating-point leaf tensors')
         if len({id(parameter) for parameter in self.params}) != len(self.params):
             raise ValueError('Duplicate optimizer parameters would be updated more than once')
         self.kind, self.lr = kind, lr
@@ -48,3 +53,4 @@ class Optimizer:
                 if self.kind == 'nadam':
                     mh = self.b1 * mh + (1-self.b1)*g/(1-self.b1**t)
                 p.add_(mh / (vh.sqrt()+self.eps), alpha=-self.lr)
+
