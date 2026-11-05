@@ -49,6 +49,9 @@ def evaluate(z,y,chunk=128):
 def triplet_accuracy(z,y,seed=42):
     """One fixed random positive and negative per validation anchor."""
     z, y = _metric_inputs(z, y)
+    _, counts = np.unique(y, return_counts=True)
+    if len(counts) < 2 or (counts < 2).any():
+        raise ValueError('Triplets require at least two classes and two samples per class')
     rng = np.random.default_rng(seed)
     p,n = [],[]
     for i,c in enumerate(y):
