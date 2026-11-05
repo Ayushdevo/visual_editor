@@ -21,7 +21,9 @@ class Images(Dataset):
         self.ids = np.array(raw_ids, dtype=np.int64, copy=True)
         if (self.ids < 0).any() or (self.ids >= len(self.labels)).any():
             raise ValueError('ids must be valid dataset indices')
-        self.targets = labels[self.ids]
+        if self.labels.ndim != 1 or len(self.images) != len(self.labels):
+            raise ValueError('images and one-dimensional labels must be aligned')
+        self.targets = self.labels[self.ids]
         self.transform = transform(train)
     def __len__(self):
         return len(self.ids)
