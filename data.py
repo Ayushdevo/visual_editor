@@ -41,6 +41,9 @@ def load(root='data', seed=42):
 class PKSampler(Sampler):
     """Each batch has P distinct classes and K distinct samples per class."""
     def __init__(self, targets, p=16, k=4, seed=42):
+        if any(isinstance(v, (bool, np.bool_)) or not isinstance(v, (int, np.integer))
+               for v in (p, k)):
+            raise ValueError('p and k must be integers')
         self.groups = [np.flatnonzero(np.asarray(targets)==c) for c in np.unique(targets)]
         self.p,self.k,self.seed,self.epoch = p,k,seed,0
         if p < 2 or p > len(self.groups) or k < 2 or any(len(g)<k for g in self.groups):
@@ -62,3 +65,4 @@ def seed_all(seed):
         torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
+
