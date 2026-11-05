@@ -14,7 +14,13 @@ def transform(train=False):
 
 class Images(Dataset):
     def __init__(self, images, labels, ids, train=False):
-        self.images, self.labels, self.ids = images, labels, np.asarray(ids)
+        self.images, self.labels = images, np.asarray(labels)
+        raw_ids = np.asarray(ids)
+        if raw_ids.ndim != 1 or (raw_ids.size and raw_ids.dtype.kind not in 'iu'):
+            raise ValueError('ids must be a one-dimensional integer sequence')
+        self.ids = np.array(raw_ids, dtype=np.int64, copy=True)
+        if (self.ids < 0).any() or (self.ids >= len(self.labels)).any():
+            raise ValueError('ids must be valid dataset indices')
         self.targets = labels[self.ids]
         self.transform = transform(train)
     def __len__(self):
