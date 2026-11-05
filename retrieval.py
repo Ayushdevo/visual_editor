@@ -18,8 +18,11 @@ class L2Index:
         # Process one query at a time to bound temporary memory by gallery size.
         distances = np.empty((len(q), len(self.gallery)), dtype=np.float64)
         for row, query in enumerate(q):
-            difference = self.gallery - query
-            distances[row] = np.einsum('ij,ij->i', difference, difference)
+            with np.errstate(over='ignore', invalid='ignore'):
+                difference = self.gallery - query
+                distances[row] = np.einsum('ij,ij->i', difference, difference)
+            if not np.isfinite(distances[row]).all():
+                raise ValueError('Squared L2 distance exceeds floating-point range')
         return distances
     def search(self, queries, k=5, exclude=None):
         if isinstance(k, (bool, np.bool_)) or not isinstance(k, (int, np.integer)) or k < 0:
@@ -34,3 +37,4 @@ class L2Index:
         available = len(self.gallery) - (exclude is not None)
         ids = np.argsort(d,axis=1,kind='stable')[:, :min(k, available)]
         return ids,np.take_along_axis(d,ids,axis=1)
+
