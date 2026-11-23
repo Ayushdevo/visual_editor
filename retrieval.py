@@ -34,6 +34,9 @@ class L2Index:
             raise ValueError('k must be a nonnegative integer')
         d = self.distances(queries)
         if exclude is not None:
+            if isinstance(exclude, (tuple, list)) and any(
+                    isinstance(index, (bool, np.bool_)) for index in exclude):
+                raise ValueError('exclude must contain one valid integer gallery index per query')
             excluded = np.asarray(exclude)
             if excluded.shape != (len(d),):
                 raise ValueError('exclude must contain one valid integer gallery index per query')
