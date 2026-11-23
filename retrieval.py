@@ -3,13 +3,18 @@ import numpy as np
 
 class L2Index:
     def __init__(self, embeddings):
+        if np.iscomplexobj(embeddings):
+            raise ValueError("Gallery embeddings must be real")
         self.gallery = np.array(embeddings,dtype=np.float64,copy=True)
         if self.gallery.ndim != 2 or 0 in self.gallery.shape:
             raise ValueError('Gallery must be a nonempty embedding matrix')
         if not np.isfinite(self.gallery).all():
             raise ValueError('Gallery embeddings must be finite')
     def distances(self, queries):
-        q = np.atleast_2d(queries).astype(np.float64)
+        q = np.atleast_2d(queries)
+        if np.iscomplexobj(q):
+            raise ValueError("Query embeddings must be real")
+        q = q.astype(np.float64)
         if q.ndim != 2 or q.shape[1] != self.gallery.shape[1]:
             raise ValueError('Query matrix dimension must match gallery embeddings')
         if not np.isfinite(q).all():
