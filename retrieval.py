@@ -35,10 +35,13 @@ class L2Index:
         d = self.distances(queries)
         if exclude is not None:
             excluded = np.asarray(exclude)
-            if (excluded.shape != (len(d),) or excluded.dtype.kind not in 'iu'
-                    or (excluded < 0).any() or (excluded >= len(self.gallery)).any()):
+            if excluded.shape != (len(d),):
                 raise ValueError('exclude must contain one valid integer gallery index per query')
-            d[np.arange(len(d)), excluded] = np.inf
+            if excluded.size:
+                if (excluded.dtype.kind not in 'iu' or (excluded < 0).any()
+                        or (excluded >= len(self.gallery)).any()):
+                    raise ValueError('exclude must contain one valid integer gallery index per query')
+                d[np.arange(len(d)), excluded] = np.inf
         available = len(self.gallery) - (exclude is not None)
         ids = np.argsort(d,axis=1,kind='stable')[:, :min(k, available)]
         return ids,np.take_along_axis(d,ids,axis=1)
