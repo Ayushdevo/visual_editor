@@ -21,6 +21,8 @@ def _metric_inputs(z, y):
         raise ValueError('Metrics require at least two embedding samples with nonzero dimension')
     if y.ndim != 1 or len(y) != len(z):
         raise ValueError('Metrics require one-dimensional labels aligned with samples')
+    if np.issubdtype(y.dtype, np.inexact) and not np.isfinite(y).all():
+        raise ValueError('Numeric labels must be finite')
     if np.iscomplexobj(z):
         raise ValueError('Embedding samples must be real')
     if not np.isfinite(z).all():
