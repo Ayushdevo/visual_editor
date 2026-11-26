@@ -17,10 +17,12 @@ def embed(model, dataset, device, batch_size=256):
 
 def _metric_inputs(z, y):
     z, y = np.asarray(z), np.asarray(y)
-    if z.ndim != 2 or len(z) < 2:
-        raise ValueError('Metrics require at least two embedding samples')
+    if z.ndim != 2 or len(z) < 2 or z.shape[1] == 0:
+        raise ValueError('Metrics require at least two embedding samples with nonzero dimension')
     if y.ndim != 1 or len(y) != len(z):
         raise ValueError('Metrics require one-dimensional labels aligned with samples')
+    if np.iscomplexobj(z):
+        raise ValueError('Embedding samples must be real')
     if not np.isfinite(z).all():
         raise ValueError('Embedding samples must be finite')
     return z, y
