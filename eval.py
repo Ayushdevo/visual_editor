@@ -57,7 +57,13 @@ def triplet_accuracy(z,y,seed=42):
     for i,c in enumerate(y):
         p.append(rng.choice(np.flatnonzero((y==c)&(np.arange(len(y))!=i))))
         n.append(rng.choice(np.flatnonzero(y!=c)))
-    dp = ((z-z[p])**2).sum(1)
-    dn = ((z-z[n])**2).sum(1)
+    # Convert before subtracting: unsigned integers wrap and float32 can
+    # overflow even when the resulting squared distance fits in float64.
+    z = z.astype(np.float64)
+    with np.errstate(over='ignore', invalid='ignore'):
+        dp = ((z-z[p])**2).sum(1)
+        dn = ((z-z[n])**2).sum(1)
+    if not np.isfinite(dp).all() or not np.isfinite(dn).all():
+        raise ValueError('Squared L2 distance exceeds floating-point range')
     return float((dp<dn).mean())
 
